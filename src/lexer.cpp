@@ -67,7 +67,7 @@ namespace monkey {
         if(ch == '/' && peekChar() == '/') {  // add comment support
             while(ch != '\n')
                 readChar();
-            readChar();
+            skipWhitespace();
         }
     }
 
