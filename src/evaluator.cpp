@@ -93,6 +93,9 @@ namespace monkey {
         else if(op == "/" && rightVal != 0) {
             return new Integer(leftVal / rightVal);
         }
+        else if(op == "%" && rightVal != 0) {
+            return new Integer(leftVal % rightVal);
+        }
         else if(op == "==") {
             return leftVal == rightVal ? __TRUE : __FALSE;
         }

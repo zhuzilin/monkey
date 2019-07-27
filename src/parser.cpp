@@ -11,6 +11,7 @@ namespace monkey {
         {MINUS,    SUM},
         {SLASH,    PRODUCT},
         {ASTERISK, PRODUCT},
+        {PERCENT,  PRODUCT},
         {LPAREN,   CALL}
     });
 
@@ -350,6 +351,7 @@ namespace monkey {
         infixParseFns[MINUS]    = &Parser::parseInfixExpression;
         infixParseFns[SLASH]    = &Parser::parseInfixExpression;
         infixParseFns[ASTERISK] = &Parser::parseInfixExpression;
+        infixParseFns[PERCENT]  = &Parser::parseInfixExpression;
         infixParseFns[EQ]       = &Parser::parseInfixExpression;
         infixParseFns[NE]       = &Parser::parseInfixExpression;
         infixParseFns[LT]       = &Parser::parseInfixExpression;

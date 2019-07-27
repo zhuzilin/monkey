@@ -9,7 +9,7 @@
             "command": "g++",
             "args": [
                 "-std=c++11",
-                "repl.cpp",
+                "main.cpp",
                 "src/*.cpp",
                 "-o",
                 "monkey",

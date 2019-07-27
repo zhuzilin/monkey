@@ -28,6 +28,7 @@ namespace monkey {
     const TokenType BANG     = "!";
     const TokenType ASTERISK = "*";
     const TokenType SLASH    = "/";
+    const TokenType PERCENT  = "%";
 
     const TokenType LT       = "<";
     const TokenType GT       = ">";

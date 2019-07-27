@@ -64,6 +64,11 @@ namespace monkey {
     void Lexer::skipWhitespace() {
         while(ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n')
             readChar();
+        if(ch == '/' && peekChar() == '/') {  // add comment support
+            while(ch != '\n')
+                readChar();
+            readChar();
+        }
     }
 
     /*
@@ -111,6 +116,10 @@ namespace monkey {
             break;
         case '/':
             tok = Token(SLASH, ch);
+            readChar();
+            break;
+        case '%':
+            tok = Token(PERCENT, ch);
             readChar();
             break;
         case '<':
