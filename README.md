@@ -3,8 +3,26 @@ A C++ version [monkey](https://monkeylang.org/) language interpreter. From [Writ
 ## Usage
 You can use the vscode config to build and run the interpreter. Or
 ```bash
-g++ -std=c++11 repl.cpp src/*.cpp -o monkey --debug
-./monkey
+> g++ -std=c++11 main.cpp src/*.cpp -o monkey --debug
+> ./monkey test.mk
+> Integer
+> 20
+```
+The `test.mk` is a gcd function.
+```js
+let a = 100;
+let b = 120;
+
+// gcd function
+let gcd = fn (a, b) {
+	if(b == 0) {
+		return a;
+	} else {
+		return gcd(b, a%b);
+	}
+}
+
+gcd(a, b);
 ```
 And `repl.cpp` is the REPL(Read-Eval-Print Loop) main function, to only use parser or lexer, you can change to `rppl.cpp` or `rlpl.cpp`.
 
