@@ -7,7 +7,7 @@ namespace monkey {
     typedef std::string TokenType;
     class Token {
     public:
-        Token() {}
+        Token() { }
         Token(TokenType type, std::string literal) : type(type), literal(literal) {}
         Token(TokenType type, char ch) : type(type), literal(std::string(1, ch)) {}
 

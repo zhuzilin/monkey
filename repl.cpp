@@ -9,6 +9,7 @@ void eval() {
     const std::string PROMPT = ">> ";
     monkey::Lexer l;
     monkey::Parser p;
+    monkey::Evaluator e;
     monkey::Environment* env = new monkey::Environment();
     while(true) {
         std::string line;
@@ -23,7 +24,7 @@ void eval() {
             }
             continue;
         }
-        monkey::Object* o = monkey::Eval(program, env);
+        monkey::Object* o = e.Eval(program, env);
         std::cout << "type: " << o->Type() << std::endl;
         std::cout << o->Inspect() << std::endl;
     }

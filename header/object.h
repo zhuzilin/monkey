@@ -18,13 +18,19 @@ namespace monkey {
 
     class Object {
     public:
+        Object() : next(nullptr), mark(0) {}
+        virtual ~Object() { }
         virtual ObjectType Type() = 0;
         virtual std::string Inspect() = 0;
+
+        // for GC (mark and sweep)
+        Object* next;
+        bool mark;
     };
 
     class Integer : public Object {
     public:
-        Integer(int v) : value(v) { }
+        Integer(int v) : Object(), value(v) { }
         ObjectType Type() { return INTEGER_OBJ; }
         std::string Inspect() { return std::to_string(value); }
 
@@ -33,8 +39,7 @@ namespace monkey {
 
     class Boolean : public Object {
     public:
-        Boolean() { }
-        Boolean(bool b) : value(b) { }
+        Boolean(bool b) : Object(), value(b) { }
         ObjectType Type() { return BOOLEAN_OBJ; }
         std::string Inspect() { return value ? "true" : "false"; }
 
@@ -43,8 +48,7 @@ namespace monkey {
 
     class String : public Object {
     public:
-        String() { }
-        String(std::string s) : value(s) { }
+        String(std::string s) : Object(), value(s) { }
         ObjectType Type() { return STRING_OBJ; }
         std::string Inspect() { return value; }
 
@@ -59,7 +63,7 @@ namespace monkey {
 
     class ReturnValue : public Object {
     public:
-        ReturnValue(Object* v) : value(v) { } 
+        ReturnValue(Object* v) : Object(), value(v) { }
         ObjectType Type() { return RETURN_VALUE_OBJ; }
         std::string Inspect() { return value->Inspect(); }
         
@@ -68,7 +72,7 @@ namespace monkey {
 
     class Error : public Object {
     public:
-        Error(std::string msg) : message(msg) { }
+        Error(std::string msg) : Object(), message(msg) { }
         ObjectType Type() { return ERROR_OBJ; }
         std::string Inspect() { return "ERROR: " + message; }
         
@@ -79,8 +83,14 @@ namespace monkey {
 
     class Function : public Object {
     public:
-        Function(std::vector<Identifier*>& params, BlockStatement* b, Environment* e) :
-            parameters(params), body(b), env(e) { }
+        Function(std::vector<Identifier*>& params, BlockStatement* b) :
+            Object(), parameters(params), body(b) { }
+        ~Function() {
+            for(auto param : parameters)
+                delete param;
+            delete body;
+            //delete env;
+        }
         ObjectType Type() { return FUNCTION_OBJ; }
         std::string Inspect() {
             std::string res =  "fn (";
@@ -93,7 +103,6 @@ namespace monkey {
 
         std::vector<Identifier*> parameters;
         BlockStatement* body;
-        Environment* env;
     };
 }
 

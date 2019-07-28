@@ -11,6 +11,7 @@ namespace monkey {
      */
     class Node {
     public:
+        virtual ~Node() { };
         virtual std::string TokenLiteral() = 0;
         virtual std::string String() = 0;
         virtual std::string Type() = 0;

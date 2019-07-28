@@ -10,10 +10,10 @@
             "request": "launch",
             "program": "${workspaceFolder}/monkey",
             "args": ["test.mk"],
-            "stopAtEntry": true,
+            "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "MIMode": "gdb",
             "setupCommands": [
                 {

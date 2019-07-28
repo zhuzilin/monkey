@@ -26,17 +26,27 @@ namespace monkey {
         return false;
     }
 
-    Object* evalStatements(std::vector<Statement*> statements, Environment* env) {
+    Object* Evaluator::evalStatements(std::vector<Statement*> statements, Environment* env) {
         Object* result;
         for(auto stmt : statements) {
             result = Eval(stmt, env);
+            gc.Mark(result);  // mark the intermediate result
+            if (result->Type() == RETURN_VALUE_OBJ) {
+                gc.Mark(((ReturnValue*)result)->value);
+            }
+            gcCounter++;
+            if(gcCounter == 100) {
+                gc.Mark(env);
+                gc.Sweep();
+                gcCounter = 0;
+            }
             if (result->Type() == RETURN_VALUE_OBJ || result->Type() == ERROR_OBJ)
                 return result;
         }
         return result;
     }
 
-    Object* evalBangOperatorExpression(Object* right) {
+    Object* Evaluator::evalBangOperatorExpression(Object* right) {
         if (right == __TRUE) {
             return __FALSE;
         } 
@@ -58,7 +68,7 @@ namespace monkey {
         }
     }
 
-    Object* evalMinusPrefixExpression(Object* right) {
+    Object* Evaluator::evalMinusPrefixExpression(Object* right) {
         if(right->Type() == INTEGER_OBJ) {
             Integer* i = new Integer(-((Integer*)right)->value);
             return i;
@@ -66,7 +76,7 @@ namespace monkey {
         return new Error("unknown operator: -" +  right->Type());
     }
 
-    Object* evalPrefixExpression(std::string op, Object* right) {
+    Object* Evaluator::evalPrefixExpression(std::string op, Object* right) {
         if(op == "!") {
             return evalBangOperatorExpression(right);
         }
@@ -78,23 +88,24 @@ namespace monkey {
         }
     }
 
-    Object* evalIntegerInfixExpression(std::string op, Object* left, Object* right) {
+    Object* Evaluator::evalIntegerInfixExpression(std::string op, Object* left, Object* right) {
         int leftVal = ((Integer*)left)->value;
         int rightVal = ((Integer*)right)->value;
+        Object* res;
         if(op == "+") {
-            return new Integer(leftVal + rightVal);
+            res = new Integer(leftVal + rightVal);
         }
         else if(op == "-") {
-            return new Integer(leftVal - rightVal);
+            res = new Integer(leftVal - rightVal);
         }
         else if(op == "*") {
-            return new Integer(leftVal * rightVal);
+            res = new Integer(leftVal * rightVal);
         }
         else if(op == "/" && rightVal != 0) {
-            return new Integer(leftVal / rightVal);
+            res = new Integer(leftVal / rightVal);
         }
         else if(op == "%" && rightVal != 0) {
-            return new Integer(leftVal % rightVal);
+            res = new Integer(leftVal % rightVal);
         }
         else if(op == "==") {
             return leftVal == rightVal ? __TRUE : __FALSE;
@@ -111,20 +122,25 @@ namespace monkey {
         else {
             return new Error("unknown operator: " + left->Type() + " " + op + " " +  right->Type());
         }
+        gc.Add(res);
+        return res;
     }
 
-    Object* evalStringInfixExpression(std::string op, Object* left, Object* right) {
+    Object* Evaluator::evalStringInfixExpression(std::string op, Object* left, Object* right) {
         std::string leftVal = ((String*)left)->value;
         std::string rightVal = ((String*)right)->value;
+        Object* res;
         if(op == "+") {
-            return new String(leftVal + rightVal);
+            res = new String(leftVal + rightVal);
         }
         else {
             return new Error("unknown operator: " + left->Type() + " " + op + " " +  right->Type());
         }
+        gc.Add(res);
+        return res;
     }
 
-    Object* evalInfixExpression(std::string op, Object* left, Object* right) {
+    Object* Evaluator::evalInfixExpression(std::string op, Object* left, Object* right) {
         if (left->Type() == INTEGER_OBJ && right->Type() == INTEGER_OBJ) {
             return evalIntegerInfixExpression(op, left, right);
         }
@@ -146,15 +162,15 @@ namespace monkey {
             return new Error("unknown operator: " + left->Type() + " " + op + " " +  right->Type());
     }
 
-    Environment* extendedFunctionEnv(Function* fn, std::vector<Object*>& args) {
-        Environment* env = fn->env->NewEnclosedEnvironment();
+    Environment* Evaluator::extendedFunctionEnv(Function* fn, std::vector<Object*>& args, Environment* outer) {
+        Environment* env = outer->NewEnclosedEnvironment();
         for(int i=0; i<args.size(); i++) {
             env->Set(fn->parameters[i]->value, args[i]);
         }
         return env;
     }
 
-    Object* evalFunction(Object* fn, std::vector<Object*>& args) {
+    Object* Evaluator::evalFunction(Object* fn, std::vector<Object*>& args, Environment* env) {
         if(fn->Type() != FUNCTION_OBJ) {
             return new Error("not a function: " + fn->Type());
         }
@@ -163,15 +179,16 @@ namespace monkey {
                 ") not equal to parameter length (" 
                 + std::to_string(((Function*)fn)->parameters.size()) + ")");
         }
-        Environment* extendedEnv = extendedFunctionEnv((Function*)fn, args);
+        Environment* extendedEnv = extendedFunctionEnv((Function*)fn, args, env);
         Object* evaluated = Eval(((Function*)fn)->body, extendedEnv);
+        delete extendedEnv;
         if(evaluated->Type() == RETURN_VALUE_OBJ) {
             return ((ReturnValue*)evaluated)->value;
         }
         return evaluated;
     }
 
-    Object* evalProgram(Program* program, Environment* env) {
+    Object* Evaluator::evalProgram(Program* program, Environment* env) {
         Object* o = evalStatements(program->statements, env);
         if (o->Type() == RETURN_VALUE_OBJ) {  // unwrap return value
             return ((ReturnValue*)o)->value;
@@ -179,13 +196,14 @@ namespace monkey {
         return o;
     }
 
-    Object* Eval(Node* node, Environment* env) {
+    Object* Evaluator::Eval(Node* node, Environment* env) {
         std::string type = node->Type();
         if (type == "Program") {
             return evalProgram((Program*)node, env);
         } 
         else if (type == "IntegerLiteral") {
             Integer* i = new Integer(((IntegerLiteral*)node)->value);
+            gc.Add(i);
             return i;
         } 
         else if (type == "BooleanLiteral") {
@@ -193,13 +211,16 @@ namespace monkey {
         }
         else if (type == "StringLiteral") {
             String* s = new String(((StringLiteral*)node)->value);
+            gc.Add(s);
             return s;
         }
         else if (type == "Identifier") {
             return env->Get(((Identifier*)node)->value);
         }
         else if (type == "FunctionLiteral") {
-            return new Function(((FunctionLiteral*)node)->parameters, ((FunctionLiteral*)node)->body, env);
+            Function* f =  new Function(((FunctionLiteral*)node)->parameters, ((FunctionLiteral*)node)->body);
+            gc.Add(f);
+            return f;
         }
         else if (type == "CallExpression") {
             Object* function = Eval(((CallExpression*)node)->function, env);
@@ -207,13 +228,13 @@ namespace monkey {
                 return function;
             
             std::vector<Object*> args;
-            for(auto* argument : ((CallExpression*)node)->arguments) {
+            for(auto* argument : ((CallExpression*)node)->arguments) {  // for convenience, using pass by value
                 Object* arg = Eval(argument, env);
                 if(isError(arg))
                     return arg;
                 args.push_back(arg);
             }
-            return evalFunction(function, args);
+            return evalFunction(function, args, env);
         }
         else if (type == "PrefixExpression") {
             Object* right = Eval(((PrefixExpression*)node)->right, env);
@@ -225,9 +246,13 @@ namespace monkey {
             Object* left = Eval(((InfixExpression*)node)->left, env);
             if (isError(left))
                 return left;
+            // to save tmp data
+            // TODO: find a better way
+            env->Set(std::to_string((intptr_t)left), left);
             Object* right = Eval(((InfixExpression*)node)->right, env);
             if (isError(right))
                 return right;
+            env->store.erase(std::to_string((intptr_t)left));
             return evalInfixExpression(((InfixExpression*)node)->op, left, right);
         }
         else if (type == "IfExpression") {
