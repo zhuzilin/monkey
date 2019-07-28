@@ -29,6 +29,6 @@ And `repl.cpp` is the REPL(Read-Eval-Print Loop) main function, to only use pars
 
 ## TODOs
 * [ ] Add error handling for lexer.
-* [x] Add garbage collection (maybe just using the share_ptr).
+* [x] Add garbage collection.
 * [ ] Add array and dictionary support.
 * [ ] Add buildin functions.
