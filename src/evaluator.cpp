@@ -119,6 +119,12 @@ namespace monkey {
         else if(op == "<") {
             return leftVal < rightVal ? __TRUE : __FALSE;
         }
+        else if(op == ">=") {
+            return leftVal >= rightVal ? __TRUE : __FALSE;
+        }
+        else if(op == "<=") {
+            return leftVal <= rightVal ? __TRUE : __FALSE;
+        }
         else {
             return new Error("unknown operator: " + left->Type() + " " + op + " " +  right->Type());
         }
@@ -267,15 +273,15 @@ namespace monkey {
                 return __NULL;
             }
         }
-        else if (type == "ForExpression") {
+        else if (type == "WhileExpression") {
             while (true) {
-                Object* condition = Eval(((ForExpression*)node)->condition, env);
+                Object* condition = Eval(((WhileExpression*)node)->condition, env);
                 if(isError(condition))
                     return condition;
                 if(!isTruthy(condition))
                     return __NULL;
-                Object* result = Eval(((ForExpression*)node)->consequence, env);
-                if (result->Type() == "ReturnValue")
+                Object* result = Eval(((WhileExpression*)node)->consequence, env);
+                if (result->Type() == RETURN_VALUE_OBJ)
                     return result;
             }
         }

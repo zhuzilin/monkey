@@ -9,7 +9,7 @@ namespace monkey {
         {"if", IF},
         {"else", ELSE},
         {"return", RETURN},
-        {"for", FOR}
+        {"while", WHILE}
     });
 
     TokenType LookupIdent(std::string ident) {

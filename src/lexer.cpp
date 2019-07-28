@@ -102,6 +102,24 @@ namespace monkey {
             }
             readChar();
             break;
+        case '<':
+            if(peekChar() == '=') {
+                tok = Token(LE, "<=");
+                readChar();
+            } else {
+                tok = Token(LT, ch);
+            }
+            readChar();
+            break;
+        case '>':
+            if(peekChar() == '=') {
+                tok = Token(GE, ">=");
+                readChar();
+            } else {
+                tok = Token(GT, ch);
+            }
+            readChar();
+            break;
         case '+':
             tok = Token(PLUS, ch);
             readChar();
@@ -120,14 +138,6 @@ namespace monkey {
             break;
         case '%':
             tok = Token(PERCENT, ch);
-            readChar();
-            break;
-        case '<':
-            tok = Token(LT, ch);
-            readChar();
-            break;
-        case '>':
-            tok = Token(GT, ch);
             readChar();
             break;
         case ',':

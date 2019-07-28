@@ -32,6 +32,8 @@ namespace monkey {
 
     const TokenType LT       = "<";
     const TokenType GT       = ">";
+    const TokenType LE       = "<=";
+    const TokenType GE       = ">=";
 
     const TokenType EQ       = "==";
     const TokenType NE       = "!=";
@@ -52,7 +54,7 @@ namespace monkey {
     const TokenType IF       = "IF";
     const TokenType ELSE     = "ELSE";
     const TokenType RETURN   = "RETURN";
-    const TokenType FOR      = "FOR";
+    const TokenType WHILE    = "WHILE";
 
     extern std::unordered_map<std::string, TokenType> keywords;
 

@@ -71,8 +71,8 @@ namespace monkey{
         return res;
     }
 
-    std::string ForExpression::String() {
-        std::string res = "for " + condition->String() + " " + consequence->String();
+    std::string WhileExpression::String() {
+        std::string res = "while " + condition->String() + " " + consequence->String();
         return res;
     }
 

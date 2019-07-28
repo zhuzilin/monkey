@@ -54,7 +54,7 @@ namespace monkey {
         Expression* parseFunctionLiteral();
         Expression* parseGroupedExpression();
         Expression* parseIfExpression();
-        Expression* parseForExpression();
+        Expression* parseWhileExpression();
         // infix parser functions
         std::vector<Expression*> parseCallArguments();
         Expression* parseCallExpression(Expression* function);

@@ -7,6 +7,8 @@ namespace monkey {
         {NE,       EQUALS},
         {LT,       LESSGREATER},
         {GT,       LESSGREATER},
+        {LE,       LESSGREATER},
+        {GE,       LESSGREATER},
         {PLUS,     SUM},
         {MINUS,    SUM},
         {SLASH,    PRODUCT},
@@ -285,8 +287,8 @@ namespace monkey {
         return exp;
     }
 
-    Expression* Parser::parseForExpression() {
-        ForExpression* exp = new ForExpression();
+    Expression* Parser::parseWhileExpression() {
+        WhileExpression* exp = new WhileExpression();
         exp->token = curToken;
         
         // condition
@@ -371,7 +373,7 @@ namespace monkey {
         prefixParseFns[FALSE]    = &Parser::parseBoolean;
         prefixParseFns[LPAREN]   = &Parser::parseGroupedExpression;
         prefixParseFns[IF]       = &Parser::parseIfExpression;
-        prefixParseFns[FOR]      = &Parser::parseForExpression;
+        prefixParseFns[WHILE]      = &Parser::parseWhileExpression;
         prefixParseFns[FUNCTION] = &Parser::parseFunctionLiteral;
         // infix parse functions
         infixParseFns[PLUS]     = &Parser::parseInfixExpression;
@@ -383,6 +385,8 @@ namespace monkey {
         infixParseFns[NE]       = &Parser::parseInfixExpression;
         infixParseFns[LT]       = &Parser::parseInfixExpression;
         infixParseFns[GT]       = &Parser::parseInfixExpression;
+        infixParseFns[LE]       = &Parser::parseInfixExpression;
+        infixParseFns[GE]       = &Parser::parseInfixExpression;
         infixParseFns[LPAREN]   = &Parser::parseCallExpression;
         // read two tokens, so that both curToken and peekToken are set.
         nextToken();

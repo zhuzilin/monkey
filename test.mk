@@ -1,13 +1,20 @@
-let a = 100;
-let b = 120;
+let a = 1321231;
 
-// gcd function
-let gcd = fn (a, b) {
-	if(b == 0) {
-		return a;
-	} else {
-		return gcd(b, a%b);
+// find mininum factor that is greater than 1
+let minFactor = fn (a) {
+	let i = 2;
+	while(true) {
+		if (a % i == 0) { 
+			return i;
+		}
+		let i = i + 1;
 	}
 }
 
-gcd(a, b);
+let f = minFactor(a);
+
+if (f == a) {
+	return "prime!";
+} else {
+	return f;
+}
