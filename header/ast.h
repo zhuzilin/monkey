@@ -118,6 +118,22 @@ namespace monkey {
         BlockStatement* body;
     };
 
+    class ArrayLiteral : public Expression {
+    public:
+        ~ArrayLiteral() {
+            for(auto elem : elements) {
+                delete elem;
+            }
+        }
+        void expressionNode() { }
+        std::string TokenLiteral() { return token.literal; }
+        std::string String();
+        std::string Type() { return "ArrayLiteral"; }
+        
+        Token token;
+        std::vector<Expression*> elements;
+    };
+
     class CallExpression : public Expression {
     public:
         ~CallExpression() {
@@ -134,6 +150,18 @@ namespace monkey {
         Token token;
         Expression* function;
         std::vector<Expression*> arguments;
+    };
+
+    class IndexExpression : public Expression {
+    public:
+        void expressionNode() { }
+        std::string TokenLiteral() { return token.literal; }
+        std::string String();
+        std::string Type() { return "IndexExpression"; }
+
+        Token token;
+        Expression* array;
+        Expression* index;
     };
 
     class PrefixExpression : public Expression {

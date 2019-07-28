@@ -20,7 +20,9 @@ namespace monkey {
         Object* evalStringInfixExpression(std::string op, Object* left, Object* right);
         Object* evalInfixExpression(std::string op, Object* left, Object* right);
         Environment* extendedFunctionEnv(Function* fn, std::vector<Object*>& args, Environment* env);
-        Object* evalFunction(Object* fn, std::vector<Object*>& args, Environment* env);
+        Object* evalIndexExpression(Object* array, Object* index, Environment* env);
+        Object* evalArrayIndexExpression(Array* array, Integer* index);
+        Object* evalCallExpression(Object* fn, std::vector<Object*>& args, Environment* env);
         Object* evalProgram(Program* program, Environment* env);
 
         GarbageCollector gc;

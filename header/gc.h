@@ -20,6 +20,11 @@ namespace monkey {
             if(obj->mark)
                 return;
             obj->mark = true;
+            if (obj->Type() == ARRAY_OBJ) {
+                for (auto elem : ((Array*)obj)->elements) {
+                    Mark(elem);
+                }
+            }
         }
 
         void Mark(Environment* env) {

@@ -15,6 +15,7 @@ namespace monkey {
     const ObjectType RETURN_VALUE_OBJ = "RETURN_VALUE";
     const ObjectType ERROR_OBJ        = "ERROR";
     const ObjectType FUNCTION_OBJ     = "FUNCTION";
+    const ObjectType ARRAY_OBJ        = "ARRAY";
 
     class Object {
     public:
@@ -89,7 +90,6 @@ namespace monkey {
             for(auto param : parameters)
                 delete param;
             delete body;
-            //delete env;
         }
         ObjectType Type() { return FUNCTION_OBJ; }
         std::string Inspect() {
@@ -97,12 +97,33 @@ namespace monkey {
             for (auto ident : parameters) {
                 res += ident->String() + ", ";
             }
-            res += body->String();
+            res += ")" + body->String();
             return res;
         }
 
         std::vector<Identifier*> parameters;
         BlockStatement* body;
+    };
+
+    class Array : public Object {
+    public:
+        Array(std::vector<Object*>& elems) :
+            Object(), elements(elems) { }
+        ~Array() {
+            for(auto elem : elements)
+                delete elem;
+        }
+        ObjectType Type() { return ARRAY_OBJ; }
+        std::string Inspect() {
+            std::string res =  "[";
+            for (auto elem : elements) {
+                res += elem->Inspect() + ", ";
+            }
+            res += "]";
+            return res;
+        }
+
+        std::vector<Object*> elements;
     };
 }
 

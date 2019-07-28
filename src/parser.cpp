@@ -14,7 +14,8 @@ namespace monkey {
         {SLASH,    PRODUCT},
         {ASTERISK, PRODUCT},
         {PERCENT,  PRODUCT},
-        {LPAREN,   CALL}
+        {LPAREN,   CALL},
+        {LBRACKET, INDEX},
     });
 
     void Parser::nextToken() {
@@ -142,6 +143,22 @@ namespace monkey {
         return leftExp;
     }
 
+    // expression with "," separate
+    // used in CallExpression and ArrayLiteral
+    std::vector<Expression*> Parser::parseExpressionList() {
+        std::vector<Expression*> arguments;
+
+        nextToken();
+        arguments.push_back(parseExpression(LOWEST));
+
+        while(peekToken.type == COMMA) {
+            nextToken();
+            nextToken();
+            arguments.push_back(parseExpression(LOWEST));
+        }
+        return arguments;
+    }
+
     Expression* Parser::parseIdentifier() {
         Identifier* ident = new Identifier();
         ident->token = curToken;
@@ -228,6 +245,19 @@ namespace monkey {
         return fn;
     }
 
+    Expression* Parser::parseArrayLiteral() {
+        ArrayLiteral* exp = new ArrayLiteral();
+        exp->token = curToken;
+        if(peekToken.type == RBRACKET) {
+            nextToken();
+            return exp;
+        }
+        exp->elements = parseExpressionList();
+        if(!expectPeek(RBRACKET))
+            exp->elements = std::vector<Expression*>();
+        return exp;
+    }
+
     Expression* Parser::parsePrefixExpression() {
         PrefixExpression* exp = new PrefixExpression();
         exp->token = curToken;
@@ -312,34 +342,30 @@ namespace monkey {
 
         return exp;
     }
-
-    std::vector<Expression*> Parser::parseCallArguments() {
-        std::vector<Expression*> arguments;
-
-        if(peekToken.type == RPAREN) {
-            nextToken();
-            return arguments;
-        }
-
-        nextToken();
-        arguments.push_back(parseExpression(LOWEST));
-
-        while(peekToken.type == COMMA) {
-            nextToken();
-            nextToken();
-            arguments.push_back(parseExpression(LOWEST));
-        }
-
-        if(!expectPeek(RPAREN))
-            return std::vector<Expression*>();
-        return arguments;
-    }
     
     Expression* Parser::parseCallExpression(Expression* function) {
         CallExpression* exp = new CallExpression();
         exp->token = curToken;
         exp->function = function;
-        exp->arguments = parseCallArguments();
+        if(peekToken.type == RPAREN) {
+            nextToken();
+            return exp;
+        }
+        exp->arguments = parseExpressionList();
+        if(!expectPeek(RPAREN))
+            exp->arguments = std::vector<Expression*>();
+        return exp;
+    }
+
+    Expression* Parser::parseIndexExpression(Expression* array) {
+        IndexExpression* exp = new IndexExpression();
+        exp->token = curToken;
+        exp->array = array;
+        nextToken();
+        exp->index = parseExpression(LOWEST);
+        if (!expectPeek(RBRACKET)) {
+            return nullptr;
+        }
         return exp;
     }
 
@@ -373,8 +399,9 @@ namespace monkey {
         prefixParseFns[FALSE]    = &Parser::parseBoolean;
         prefixParseFns[LPAREN]   = &Parser::parseGroupedExpression;
         prefixParseFns[IF]       = &Parser::parseIfExpression;
-        prefixParseFns[WHILE]      = &Parser::parseWhileExpression;
+        prefixParseFns[WHILE]    = &Parser::parseWhileExpression;
         prefixParseFns[FUNCTION] = &Parser::parseFunctionLiteral;
+        prefixParseFns[LBRACKET] = &Parser::parseArrayLiteral;
         // infix parse functions
         infixParseFns[PLUS]     = &Parser::parseInfixExpression;
         infixParseFns[MINUS]    = &Parser::parseInfixExpression;
@@ -388,6 +415,7 @@ namespace monkey {
         infixParseFns[LE]       = &Parser::parseInfixExpression;
         infixParseFns[GE]       = &Parser::parseInfixExpression;
         infixParseFns[LPAREN]   = &Parser::parseCallExpression;
+        infixParseFns[LBRACKET] = &Parser::parseIndexExpression;
         // read two tokens, so that both curToken and peekToken are set.
         nextToken();
         nextToken();

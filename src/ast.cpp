@@ -86,6 +86,15 @@ namespace monkey{
         return res;
     }
 
+    std::string ArrayLiteral::String() {
+        std::string res = "[";
+        for(auto elem : elements) {
+            res += elem->String() + ", ";
+        }
+        res += "]";
+        return res;
+    }
+
     std::string CallExpression::String() {
         std::string res = function->String() + "(";
         for(auto arg : arguments) {
@@ -93,5 +102,9 @@ namespace monkey{
         }
         res += ")";
         return res;
+    }
+
+    std::string IndexExpression::String() {
+        return "(" + array->String() + "[" + index->String() + "])";
     }
 }

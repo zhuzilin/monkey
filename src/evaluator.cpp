@@ -176,7 +176,7 @@ namespace monkey {
         return env;
     }
 
-    Object* Evaluator::evalFunction(Object* fn, std::vector<Object*>& args, Environment* env) {
+    Object* Evaluator::evalCallExpression(Object* fn, std::vector<Object*>& args, Environment* env) {
         if(fn->Type() != FUNCTION_OBJ) {
             return new Error("not a function: " + fn->Type());
         }
@@ -192,6 +192,23 @@ namespace monkey {
             return ((ReturnValue*)evaluated)->value;
         }
         return evaluated;
+    }
+
+    Object* Evaluator::evalArrayIndexExpression(Array* array, Integer* index) {
+        int i = index->value;
+        auto arr = array->elements;
+        try {
+            return arr[i];
+        } catch (const std::out_of_range e) {
+            return new Error("index " + index->Inspect() + " out of range");
+        }
+    }
+
+    Object* Evaluator::evalIndexExpression(Object* array, Object* index, Environment* env) {
+        if (array->Type() == ARRAY_OBJ && index->Type() == INTEGER_OBJ)
+            return evalArrayIndexExpression((Array*)array, (Integer*)index);
+        else
+            return new Error("index operator not supported: " + array->Type());
     }
 
     Object* Evaluator::evalProgram(Program* program, Environment* env) {
@@ -240,7 +257,30 @@ namespace monkey {
                     return arg;
                 args.push_back(arg);
             }
-            return evalFunction(function, args, env);
+            return evalCallExpression(function, args, env);
+        }
+        else if (type == "IndexExpression") {
+            Object* array = Eval(((IndexExpression*)node)->array, env);
+            if(isError(array)) {
+                return array;
+            }
+            env->Set(std::to_string((intptr_t)array), array);
+            Object* index = Eval(((IndexExpression*)node)->index, env);
+            env->store.erase(std::to_string((intptr_t)array));
+            if(isError(index)) {
+                return index;
+            }
+            return evalIndexExpression(array, index, env);
+        }
+        else if (type == "ArrayLiteral") {
+            std::vector<Object*> elems;
+            for(auto* element : ((ArrayLiteral*)node)->elements) {  // for convenience, using pass by value
+                Object* elem = Eval(element, env);
+                if(isError(elem))
+                    return elem;
+                elems.push_back(elem);
+            }
+            return new Array(elems);
         }
         else if (type == "PrefixExpression") {
             Object* right = Eval(((PrefixExpression*)node)->right, env);
@@ -252,13 +292,13 @@ namespace monkey {
             Object* left = Eval(((InfixExpression*)node)->left, env);
             if (isError(left))
                 return left;
-            // to save tmp data
+            // save tmp data
             // TODO: find a better way
             env->Set(std::to_string((intptr_t)left), left);
             Object* right = Eval(((InfixExpression*)node)->right, env);
+            env->store.erase(std::to_string((intptr_t)left));
             if (isError(right))
                 return right;
-            env->store.erase(std::to_string((intptr_t)left));
             return evalInfixExpression(((InfixExpression*)node)->op, left, right);
         }
         else if (type == "IfExpression") {

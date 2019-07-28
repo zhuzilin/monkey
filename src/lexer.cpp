@@ -164,6 +164,14 @@ namespace monkey {
             tok = Token(RBRACE, ch);
             readChar();
             break;
+        case '[':
+            tok = Token(LBRACKET, ch);
+            readChar();
+            break;
+        case ']':
+            tok = Token(RBRACKET, ch);
+            readChar();
+            break;
         case '"':
             tok = Token(STRING, readString());
             readChar();

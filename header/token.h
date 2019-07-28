@@ -41,10 +41,12 @@ namespace monkey {
     const TokenType COMMA     = ",";
     const TokenType SEMICOLON = ";";
 
-    const TokenType LPAREN  = "(";
-    const TokenType RPAREN  = ")";
-    const TokenType LBRACE  = "{";
-    const TokenType RBRACE  = "}";
+    const TokenType LPAREN   = "(";
+    const TokenType RPAREN   = ")";
+    const TokenType LBRACE   = "{";
+    const TokenType RBRACE   = "}";
+    const TokenType LBRACKET = "[";
+    const TokenType RBRACKET = "]";
 
     // keywords
     const TokenType FUNCTION = "FUNCTION";

@@ -21,7 +21,8 @@ namespace monkey {
         SUM,         // +
         PRODUCT,     // *
         PREFIX,      // -X or !X
-        CALL         // myFunction(X)
+        CALL,        // myFunction(X)
+        INDEX,       // []
     };
 
     extern std::unordered_map<TokenType, Precedence> precedences;
@@ -52,12 +53,14 @@ namespace monkey {
         Expression* parseBoolean();
         std::vector<Identifier*> parseFunctionParameters();
         Expression* parseFunctionLiteral();
+        Expression* parseArrayLiteral();
         Expression* parseGroupedExpression();
         Expression* parseIfExpression();
         Expression* parseWhileExpression();
         // infix parser functions
-        std::vector<Expression*> parseCallArguments();
+        std::vector<Expression*> parseExpressionList();
         Expression* parseCallExpression(Expression* function);
+        Expression* parseIndexExpression(Expression* array);
         Expression* parseInfixExpression(Expression* left);
 
         void noPrefixParseFnError(TokenType type);
