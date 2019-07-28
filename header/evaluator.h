@@ -22,6 +22,7 @@ namespace monkey {
         Environment* extendedFunctionEnv(Function* fn, std::vector<Object*>& args, Environment* env);
         Object* evalIndexExpression(Object* array, Object* index, Environment* env);
         Object* evalArrayIndexExpression(Array* array, Integer* index);
+        Object* evalStringIndexExpression(String* array, Integer* index);
         Object* evalCallExpression(Object* fn, std::vector<Object*>& args, Environment* env);
         Object* evalProgram(Program* program, Environment* env);
 

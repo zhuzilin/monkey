@@ -52,15 +52,43 @@ namespace monkey {
     Statement* Parser::parseStatement() {
         if (curToken.type == LET) {
             return parseLetStatement();
-        } else if (curToken.type == RETURN) {
+        } 
+        else if (curToken.type == REF) {
+            return parseRefStatement();
+        }
+        else if (curToken.type == RETURN) {
             return parseReturnStatement();
-        } else {
+        } 
+        else {
             return parseExpressionStatement();
         }
     }
 
     LetStatement* Parser::parseLetStatement() {
         LetStatement* stmt = new LetStatement();
+        stmt->token = curToken;
+
+        if(!expectPeek(IDENT)) {
+            delete stmt;
+            return nullptr;
+        }
+        stmt->name.token = curToken;
+        stmt->name.value = curToken.literal;
+        if(!expectPeek(ASSIGN)) {
+            delete stmt;
+            return nullptr;
+        }
+        nextToken();
+
+        stmt->value = parseExpression(LOWEST);
+
+        if (peekToken.type == SEMICOLON)
+            nextToken();
+        return stmt;
+    }
+
+    RefStatement* Parser::parseRefStatement() {
+        RefStatement* stmt = new RefStatement();
         stmt->token = curToken;
 
         if(!expectPeek(IDENT)) {

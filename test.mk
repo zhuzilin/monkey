@@ -14,7 +14,9 @@ let minFactor = fn (a) {
 let f = minFactor(a);
 
 if (f == a) {
-	return "prime!";
+	"prime!";
 } else {
-	return f;
+	f;
 }
+
+"ha"[0]

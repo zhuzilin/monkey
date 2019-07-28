@@ -233,6 +233,22 @@ namespace monkey {
         Expression* value;
     };
 
+    // for statement like &a = 6;
+    class RefStatement : public Statement {
+    public:
+        ~RefStatement() {
+            delete value;
+        }
+        void statementNode() { }
+        std::string TokenLiteral() { return token.literal; }
+        std::string String();
+        std::string Type() { return "RefStatement"; }
+
+        Token token;  // token &
+        Identifier name;
+        Expression* value;
+    };
+
     // for code like: return 10;
     class ReturnStatement : public Statement {
     public:

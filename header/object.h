@@ -125,6 +125,10 @@ namespace monkey {
 
         std::vector<Object*> elements;
     };
+
+    extern Null* __NULL;
+    extern Boolean* __TRUE;
+    extern Boolean* __FALSE;
 }
 
 

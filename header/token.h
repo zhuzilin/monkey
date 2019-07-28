@@ -48,6 +48,8 @@ namespace monkey {
     const TokenType LBRACKET = "[";
     const TokenType RBRACKET = "]";
 
+    const TokenType REF      = "&";
+
     // keywords
     const TokenType FUNCTION = "FUNCTION";
     const TokenType LET      = "LET";

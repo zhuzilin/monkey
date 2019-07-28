@@ -40,6 +40,7 @@ namespace monkey {
 
         Statement* parseStatement();
         LetStatement* parseLetStatement();
+        RefStatement* parseRefStatement();
         ReturnStatement* parseReturnStatement();
         ExpressionStatement* parseExpressionStatement();
         BlockStatement* parseBlockStatement();

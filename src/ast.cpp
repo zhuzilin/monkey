@@ -27,6 +27,16 @@ namespace monkey{
         return res;
     }
 
+    std::string RefStatement::String() {
+        std::string res = TokenLiteral() + 
+            name.String() + " = ";
+        if(value != nullptr) {
+            res += value->String();
+        }
+        res += ";";
+        return res;
+    }
+
     std::string ReturnStatement::String() {
         std::string res = TokenLiteral() + " ";
         if(returnValue != nullptr) {

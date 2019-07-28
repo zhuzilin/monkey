@@ -176,6 +176,10 @@ namespace monkey {
             tok = Token(STRING, readString());
             readChar();
             break;
+        case '&':
+            tok = Token(REF, ch);
+            readChar();
+            break;
         case 0:
             tok = Token(END, "");
             readChar();

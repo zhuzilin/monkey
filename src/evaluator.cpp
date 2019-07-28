@@ -1,9 +1,7 @@
 #include "../header/evaluator.h"
+#include <iostream>
 
 namespace monkey {
-    Null* __NULL = new Null();
-    Boolean* __TRUE = new Boolean(true);
-    Boolean* __FALSE = new Boolean(false);
 
     bool isTruthy(Object* condition) {
         if(condition == __TRUE) {
@@ -204,9 +202,21 @@ namespace monkey {
         }
     }
 
+    Object* Evaluator::evalStringIndexExpression(String* array, Integer* index) {
+        int i = index->value;
+        auto arr = array->value;
+        try {
+            return new String(std::string(1, arr[i]));
+        } catch (const std::out_of_range e) {
+            return new Error("index " + index->Inspect() + " out of range");
+        }
+    }
+
     Object* Evaluator::evalIndexExpression(Object* array, Object* index, Environment* env) {
         if (array->Type() == ARRAY_OBJ && index->Type() == INTEGER_OBJ)
             return evalArrayIndexExpression((Array*)array, (Integer*)index);
+        if (array->Type() == STRING_OBJ && index->Type() == INTEGER_OBJ)
+            return evalStringIndexExpression((String*)array, (Integer*)index);
         else
             return new Error("index operator not supported: " + array->Type());
     }
@@ -321,7 +331,7 @@ namespace monkey {
                 if(!isTruthy(condition))
                     return __NULL;
                 Object* result = Eval(((WhileExpression*)node)->consequence, env);
-                if (result->Type() == RETURN_VALUE_OBJ)
+                if (result->Type() == ERROR_OBJ || result->Type() == RETURN_VALUE_OBJ)
                     return result;
             }
         }
@@ -341,8 +351,13 @@ namespace monkey {
             Object* val = Eval(((LetStatement*)node)->value, env);
             if(isError(val))
                 return val;
-            env->Set(((LetStatement*)node)->name.value, val);
-            return __NULL;
+            return env->Set(((LetStatement*)node)->name.value, val);
+        }
+        else if (type == "RefStatement") {
+            Object* val = Eval(((RefStatement*)node)->value, env);
+            if(isError(val))
+                return val;
+            return env->RefSet(((LetStatement*)node)->name.value, val);
         }
         else {
             return __NULL;
