@@ -285,6 +285,32 @@ namespace monkey {
         return exp;
     }
 
+    Expression* Parser::parseForExpression() {
+        ForExpression* exp = new ForExpression();
+        exp->token = curToken;
+        
+        // condition
+        if(!expectPeek(LPAREN)) {
+            delete exp;
+            return nullptr;
+        }
+        nextToken();
+        exp->condition = parseExpression(LOWEST);
+        if(!expectPeek(RPAREN)) {
+            delete exp;
+            return nullptr;
+        }
+        
+        // consequence
+        if(!expectPeek(LBRACE)) {
+            delete exp;
+            return nullptr;
+        }
+        exp->consequence = parseBlockStatement();
+
+        return exp;
+    }
+
     std::vector<Expression*> Parser::parseCallArguments() {
         std::vector<Expression*> arguments;
 
@@ -338,13 +364,14 @@ namespace monkey {
         // prefix parse functions
         prefixParseFns[IDENT]    = &Parser::parseIdentifier;  // this is how to assign a method pointer
         prefixParseFns[INT]      = &Parser::parseIntegerLiteral;
-        prefixParseFns[STRING]      = &Parser::parseStringLiteral;
+        prefixParseFns[STRING]   = &Parser::parseStringLiteral;
         prefixParseFns[BANG]     = &Parser::parsePrefixExpression;
         prefixParseFns[MINUS]    = &Parser::parsePrefixExpression;
         prefixParseFns[TRUE]     = &Parser::parseBoolean;
         prefixParseFns[FALSE]    = &Parser::parseBoolean;
         prefixParseFns[LPAREN]   = &Parser::parseGroupedExpression;
         prefixParseFns[IF]       = &Parser::parseIfExpression;
+        prefixParseFns[FOR]      = &Parser::parseForExpression;
         prefixParseFns[FUNCTION] = &Parser::parseFunctionLiteral;
         // infix parse functions
         infixParseFns[PLUS]     = &Parser::parseInfixExpression;

@@ -1,6 +1,13 @@
-let fib = fn(n) {
-	if(n < 3) { n }
-	else { fib(n-1) + fib(n-2) }
+let a = 100;
+let b = 120;
+
+// gcd function
+let gcd = fn (a, b) {
+	if(b == 0) {
+		return a;
+	} else {
+		return gcd(b, a%b);
+	}
 }
 
-fib(30)
+gcd(a, b);

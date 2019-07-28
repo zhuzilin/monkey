@@ -52,6 +52,7 @@ namespace monkey {
     const TokenType IF       = "IF";
     const TokenType ELSE     = "ELSE";
     const TokenType RETURN   = "RETURN";
+    const TokenType FOR      = "FOR";
 
     extern std::unordered_map<std::string, TokenType> keywords;
 

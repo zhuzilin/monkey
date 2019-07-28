@@ -267,6 +267,18 @@ namespace monkey {
                 return __NULL;
             }
         }
+        else if (type == "ForExpression") {
+            while (true) {
+                Object* condition = Eval(((ForExpression*)node)->condition, env);
+                if(isError(condition))
+                    return condition;
+                if(!isTruthy(condition))
+                    return __NULL;
+                Object* result = Eval(((ForExpression*)node)->consequence, env);
+                if (result->Type() == "ReturnValue")
+                    return result;
+            }
+        }
         else if (type == "ExpressionStatement") {
             return Eval(((ExpressionStatement*)node)->expression, env);
         }

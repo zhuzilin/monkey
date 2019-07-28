@@ -71,6 +71,11 @@ namespace monkey{
         return res;
     }
 
+    std::string ForExpression::String() {
+        std::string res = "for " + condition->String() + " " + consequence->String();
+        return res;
+    }
+
     std::string FunctionLiteral::String() {
         std::string res = TokenLiteral() + " (";
         for(auto param : parameters) {

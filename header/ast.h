@@ -174,6 +174,18 @@ namespace monkey {
         BlockStatement* alternative;
     };
 
+    class ForExpression : public Expression {
+    public:
+        void expressionNode() { }
+        std::string TokenLiteral() { return token.literal; }
+        std::string String();
+        std::string Type() { return "ForExpression"; }
+        
+        Token token;  // if
+        Expression* condition;
+        BlockStatement* consequence;
+    };
+
     /*
      * Statements
      */
