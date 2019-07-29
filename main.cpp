@@ -39,6 +39,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     monkey::Object* o = e.Eval(program, env);
-    std::cout << "type: " << o->Type() << std::endl;
-    std::cout << o->Inspect() << std::endl;
+    std::cout << std::endl << "return: " << std::endl;
+    std::cout << "type:  " << o->Type() << std::endl;
+    std::cout << "value: " << o->Inspect() << std::endl;
 }

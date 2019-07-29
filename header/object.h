@@ -16,6 +16,7 @@ namespace monkey {
     const ObjectType ERROR_OBJ        = "ERROR";
     const ObjectType FUNCTION_OBJ     = "FUNCTION";
     const ObjectType ARRAY_OBJ        = "ARRAY";
+    const ObjectType BUILTIN_OBJ      = "BUILTIN";
 
     class Object {
     public:
@@ -124,6 +125,17 @@ namespace monkey {
         }
 
         std::vector<Object*> elements;
+    };
+
+    class Builtin : public Object {
+    public:
+        Builtin(Object* (*fn)(std::vector<Object*>&)) : Object(), function(fn) { }
+        ~Builtin() {
+        }
+        ObjectType Type() { return BUILTIN_OBJ; }
+        std::string Inspect() { return "builtin function"; }
+
+        Object* (*function)(std::vector<Object*>&);
     };
 
     extern Null* __NULL;

@@ -1,3 +1,5 @@
+print("hello world!");
+
 let a = 1321231;
 
 // find mininum factor that is greater than 1
@@ -14,9 +16,7 @@ let minFactor = fn (a) {
 let f = minFactor(a);
 
 if (f == a) {
-	"prime!";
+	print(a, "is a prime!");
 } else {
-	f;
+	print("minimal prime factor for", a, "is", f);
 }
-
-"ha"[0]

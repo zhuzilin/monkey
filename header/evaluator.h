@@ -1,11 +1,13 @@
 #ifndef EVALUATOR_H
 #define EVALUATOR_H
 
+#include <unordered_map>
+#include <functional>
+#include <cstdarg>
 #include "object.h"
 #include "ast.h"
 #include "environment.h"
 #include "gc.h"
-#include <unordered_set>
 
 namespace monkey {
     class Evaluator {
@@ -24,10 +26,12 @@ namespace monkey {
         Object* evalArrayIndexExpression(Array* array, Integer* index);
         Object* evalStringIndexExpression(String* array, Integer* index);
         Object* evalCallExpression(Object* fn, std::vector<Object*>& args, Environment* env);
+        Object* evalIdentifier(std::string name, Environment* env);
         Object* evalProgram(Program* program, Environment* env);
 
         GarbageCollector gc;
         int gcCounter = 0;
+
     };
     
 }

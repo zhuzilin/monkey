@@ -2,6 +2,23 @@
 #include <iostream>
 
 namespace monkey {
+    /*
+     * builtin
+     */
+
+    Object* print(std::vector<Object*>& objs) {
+        for (auto obj : objs) {
+            if(obj->Type() == ERROR_OBJ)
+                return obj;
+            std::cout << obj->Inspect() << " ";
+        }
+        std::cout << std::endl;
+        return __NULL;
+    }
+
+    std::unordered_map<std::string, Builtin*> builtin({
+        {"print", new Builtin(*print)}
+    });
 
     bool isTruthy(Object* condition) {
         if(condition == __TRUE) {
@@ -175,8 +192,11 @@ namespace monkey {
     }
 
     Object* Evaluator::evalCallExpression(Object* fn, std::vector<Object*>& args, Environment* env) {
-        if(fn->Type() != FUNCTION_OBJ) {
+        if(fn->Type() != FUNCTION_OBJ && fn->Type() != BUILTIN_OBJ) {
             return new Error("not a function: " + fn->Type());
+        }
+        if(fn->Type() == BUILTIN_OBJ) {
+            return ((Builtin*)fn)->function(args);
         }
         if(((Function*)fn)->parameters.size() != args.size()) {
             return new Error("argument length(" + std::to_string(args.size()) +
@@ -221,6 +241,14 @@ namespace monkey {
             return new Error("index operator not supported: " + array->Type());
     }
 
+    Object* Evaluator::evalIdentifier(std::string name, Environment* env) {
+        Object* obj =  env->Get(name);
+        if (obj->Type() == ERROR_OBJ && builtin.find(name) != builtin.end()) {
+            return builtin[name];
+        }
+        return obj;
+    }
+
     Object* Evaluator::evalProgram(Program* program, Environment* env) {
         Object* o = evalStatements(program->statements, env);
         if (o->Type() == RETURN_VALUE_OBJ) {  // unwrap return value
@@ -248,7 +276,7 @@ namespace monkey {
             return s;
         }
         else if (type == "Identifier") {
-            return env->Get(((Identifier*)node)->value);
+            return evalIdentifier(((Identifier*)node)->value, env);
         }
         else if (type == "FunctionLiteral") {
             Function* f =  new Function(((FunctionLiteral*)node)->parameters, ((FunctionLiteral*)node)->body);
