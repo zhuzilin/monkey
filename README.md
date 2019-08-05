@@ -1,6 +1,6 @@
 # monkey
 A C++ version [monkey](https://monkeylang.org/) language interpreter. From [Write An Interpreter In Go](https://interpreterbook.com/).
-With additional mark-and-sweep garbage control.
+With additional mark-and-sweep garbage collection.
 ## Usage
 You can use the vscode config to build and run the interpreter. Or
 ```bash
