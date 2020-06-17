@@ -28,7 +28,6 @@ namespace monkey {
 
     class Expression : public Node {
     public:
-        virtual void expressionNode() = 0;
         virtual std::string TokenLiteral() = 0;
         virtual std::string String() = 0;
         virtual std::string Type() = 0;
@@ -59,7 +58,6 @@ namespace monkey {
 
     class Identifier : public Expression {
     public:
-        void expressionNode() { }
         std::string TokenLiteral() { return token.literal; }
         std::string String() { return value; }
         std::string Type() { return "Identifier"; }
@@ -70,7 +68,6 @@ namespace monkey {
 
     class IntegerLiteral : public Expression {
     public:
-        void expressionNode() { }
         std::string TokenLiteral() { return token.literal; }
         std::string String() { return std::to_string(value); }
         std::string Type() { return "IntegerLiteral"; }
@@ -81,7 +78,6 @@ namespace monkey {
 
     class BooleanLiteral : public Expression {
     public:
-        void expressionNode() { }
         std::string TokenLiteral() { return token.literal; }
         std::string String() { return value ? "true" : "false"; }
         std::string Type() { return "BooleanLiteral"; }
@@ -92,7 +88,6 @@ namespace monkey {
 
     class StringLiteral : public Expression {
     public:
-        void expressionNode() { }
         std::string TokenLiteral() { return token.literal; }
         std::string String() { return value; }
         std::string Type() { return "StringLiteral"; }
@@ -108,7 +103,7 @@ namespace monkey {
                 delete param;
             }
         }
-        void expressionNode() { }
+
         std::string TokenLiteral() { return token.literal; }
         std::string String();
         std::string Type() { return "FunctionLiteral"; }
@@ -125,7 +120,7 @@ namespace monkey {
                 delete elem;
             }
         }
-        void expressionNode() { }
+
         std::string TokenLiteral() { return token.literal; }
         std::string String();
         std::string Type() { return "ArrayLiteral"; }
@@ -142,7 +137,7 @@ namespace monkey {
             }
             delete function;
         }
-        void expressionNode() { }
+
         std::string TokenLiteral() { return token.literal; }
         std::string String();
         std::string Type() { return "CallExpression"; }
@@ -154,7 +149,6 @@ namespace monkey {
 
     class IndexExpression : public Expression {
     public:
-        void expressionNode() { }
         std::string TokenLiteral() { return token.literal; }
         std::string String();
         std::string Type() { return "IndexExpression"; }
@@ -166,7 +160,6 @@ namespace monkey {
 
     class PrefixExpression : public Expression {
     public:
-        void expressionNode() { }
         std::string TokenLiteral() { return token.literal; }
         std::string String();
         std::string Type() { return "PrefixExpression"; }
@@ -178,7 +171,6 @@ namespace monkey {
 
     class InfixExpression : public Expression {
     public:
-        void expressionNode() { }
         std::string TokenLiteral() { return token.literal; }
         std::string String();
         std::string Type() { return "InfixExpression"; }
@@ -191,7 +183,6 @@ namespace monkey {
 
     class IfExpression : public Expression {
     public:
-        void expressionNode() { }
         std::string TokenLiteral() { return token.literal; }
         std::string String();
         std::string Type() { return "IfExpression"; }
@@ -204,7 +195,6 @@ namespace monkey {
 
     class WhileExpression : public Expression {
     public:
-        void expressionNode() { }
         std::string TokenLiteral() { return token.literal; }
         std::string String();
         std::string Type() { return "WhileExpression"; }
