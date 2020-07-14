@@ -1,147 +1,149 @@
-#ifndef OBJECT_H
-#define OBJECT_H
+#ifndef MONKEY_OBJECT_H_
+#define MONKEY_OBJECT_H_
 
 #include <vector>
 #include <string>
 #include "ast.h"
 
 namespace monkey {
-    typedef std::string ObjectType;
 
-    const ObjectType INTEGER_OBJ      = "INTEGER";
-    const ObjectType BOOLEAN_OBJ      = "BOOLEAN";
-    const ObjectType STRING_OBJ       = "STRING";
-    const ObjectType NULL_OBJ         = "NULL";
-    const ObjectType RETURN_VALUE_OBJ = "RETURN_VALUE";
-    const ObjectType ERROR_OBJ        = "ERROR";
-    const ObjectType FUNCTION_OBJ     = "FUNCTION";
-    const ObjectType ARRAY_OBJ        = "ARRAY";
-    const ObjectType BUILTIN_OBJ      = "BUILTIN";
+typedef std::string ObjectType;
 
-    class Object {
-    public:
-        Object() : next(nullptr), mark(0) {}
-        virtual ~Object() { }
-        virtual ObjectType Type() = 0;
-        virtual std::string Inspect() = 0;
+const ObjectType INTEGER_OBJ    = "INTEGER";
+const ObjectType BOOLEAN_OBJ    = "BOOLEAN";
+const ObjectType STRING_OBJ     = "STRING";
+const ObjectType NULL_OBJ     = "NULL";
+const ObjectType RETURN_VALUE_OBJ = "RETURN_VALUE";
+const ObjectType ERROR_OBJ    = "ERROR";
+const ObjectType FUNCTION_OBJ   = "FUNCTION";
+const ObjectType ARRAY_OBJ    = "ARRAY";
+const ObjectType BUILTIN_OBJ    = "BUILTIN";
 
-        // for GC (mark and sweep)
-        Object* next;
-        bool mark;
-    };
+class Object {
+ public:
+  Object() : next(nullptr), mark(0) {}
+  virtual ~Object() { }
+  virtual ObjectType Type() = 0;
+  virtual std::string Inspect() = 0;
 
-    class Integer : public Object {
-    public:
-        Integer(int v) : Object(), value(v) { }
-        ObjectType Type() { return INTEGER_OBJ; }
-        std::string Inspect() { return std::to_string(value); }
+  // for GC (mark and sweep)
+  Object* next;
+  bool mark;
+};
 
-        int value;
-    };
+class Integer : public Object {
+ public:
+  Integer(int v) : Object(), value(v) { }
+  ObjectType Type() { return INTEGER_OBJ; }
+  std::string Inspect() { return std::to_string(value); }
 
-    class Boolean : public Object {
-    public:
-        Boolean(bool b) : Object(), value(b) { }
-        ObjectType Type() { return BOOLEAN_OBJ; }
-        std::string Inspect() { return value ? "true" : "false"; }
+  int value;
+};
 
-        bool value;
-    };
+class Boolean : public Object {
+ public:
+  Boolean(bool b) : Object(), value(b) { }
+  ObjectType Type() { return BOOLEAN_OBJ; }
+  std::string Inspect() { return value ? "true" : "false"; }
 
-    class String : public Object {
-    public:
-        String(std::string s) : Object(), value(s) { }
-        ObjectType Type() { return STRING_OBJ; }
-        std::string Inspect() { return value; }
+  bool value;
+};
 
-        std::string value;
-    };
+class String : public Object {
+ public:
+  String(std::string s) : Object(), value(s) { }
+  ObjectType Type() { return STRING_OBJ; }
+  std::string Inspect() { return value; }
 
-    class Null : public Object {
-    public:
-        ObjectType Type() { return NULL_OBJ; }
-        std::string Inspect() { return "NULL"; }
-    };
+  std::string value;
+};
 
-    class ReturnValue : public Object {
-    public:
-        ReturnValue(Object* v) : Object(), value(v) { }
-        ObjectType Type() { return RETURN_VALUE_OBJ; }
-        std::string Inspect() { return value->Inspect(); }
-        
-        Object* value;
-    };
+class Null : public Object {
+ public:
+  ObjectType Type() { return NULL_OBJ; }
+  std::string Inspect() { return "NULL"; }
+};
 
-    class Error : public Object {
-    public:
-        Error(std::string msg) : Object(), message(msg) { }
-        ObjectType Type() { return ERROR_OBJ; }
-        std::string Inspect() { return "ERROR: " + message; }
-        
-        std::string message;
-    };
+class ReturnValue : public Object {
+ public:
+  ReturnValue(Object* v) : Object(), value(v) { }
+  ObjectType Type() { return RETURN_VALUE_OBJ; }
+  std::string Inspect() { return value->Inspect(); }
+    
+  Object* value;
+};
 
-    class Environment;
+class Error : public Object {
+ public:
+  Error(std::string msg) : Object(), message(msg) { }
+  ObjectType Type() { return ERROR_OBJ; }
+  std::string Inspect() { return "ERROR: " + message; }
+  
+  std::string message;
+};
 
-    class Function : public Object {
-    public:
-        Function(std::vector<Identifier*>& params, BlockStatement* b) :
-            Object(), parameters(params), body(b) { }
-        ~Function() {
-            for(auto param : parameters)
-                delete param;
-            delete body;
-        }
-        ObjectType Type() { return FUNCTION_OBJ; }
-        std::string Inspect() {
-            std::string res =  "fn (";
-            for (auto ident : parameters) {
-                res += ident->String() + ", ";
-            }
-            res += ")" + body->String();
-            return res;
-        }
+class Environment;
 
-        std::vector<Identifier*> parameters;
-        BlockStatement* body;
-    };
+class Function : public Object {
+ public:
+  Function(std::vector<Identifier*>& params, BlockStatement* b) :
+      Object(), parameters(params), body(b) { }
+  ~Function() {
+    for(auto param : parameters)
+      delete param;
+    delete body;
+  }
+  
+  ObjectType Type() { return FUNCTION_OBJ; }
+  std::string Inspect() {
+    std::string res =  "fn (";
+    for (auto ident : parameters) {
+      res += ident->String() + ", ";
+    }
+    res += ")" + body->String();
+    return res;
+  }
 
-    class Array : public Object {
-    public:
-        Array(std::vector<Object*>& elems) :
-            Object(), elements(elems) { }
-        ~Array() {
-            for(auto elem : elements)
-                delete elem;
-        }
-        ObjectType Type() { return ARRAY_OBJ; }
-        std::string Inspect() {
-            std::string res =  "[";
-            for (auto elem : elements) {
-                res += elem->Inspect() + ", ";
-            }
-            res += "]";
-            return res;
-        }
+  std::vector<Identifier*> parameters;
+  BlockStatement* body;
+};
 
-        std::vector<Object*> elements;
-    };
+class Array : public Object {
+ public:
+  Array(std::vector<Object*>& elems) :
+      Object(), elements(elems) { }
+  ~Array() {
+  for(auto elem : elements)
+    delete elem;
+  }
+  ObjectType Type() { return ARRAY_OBJ; }
+  std::string Inspect() {
+    std::string res =  "[";
+    for (auto elem : elements) {
+      res += elem->Inspect() + ", ";
+    }
+    res += "]";
+    return res;
+  }
 
-    class Builtin : public Object {
-    public:
-        Builtin(Object* (*fn)(std::vector<Object*>&)) : Object(), function(fn) { }
-        ~Builtin() {
-        }
-        ObjectType Type() { return BUILTIN_OBJ; }
-        std::string Inspect() { return "builtin function"; }
+  std::vector<Object*> elements;
+};
 
-        Object* (*function)(std::vector<Object*>&);
-    };
+class Builtin : public Object {
+ public:
+  Builtin(Object* (*fn)(std::vector<Object*>&)) : Object(), function(fn) { }
+  ~Builtin() {}
+  ObjectType Type() { return BUILTIN_OBJ; }
+  std::string Inspect() { return "builtin function"; }
 
-    extern Null* __NULL;
-    extern Boolean* __TRUE;
-    extern Boolean* __FALSE;
-}
+  Object* (*function)(std::vector<Object*>&);
+};
+
+extern Null* __NULL;
+extern Boolean* __TRUE;
+extern Boolean* __FALSE;
+
+}  // namespace monkey
 
 
-#endif
+#endif  // MONKEY_OBJECT_H_
